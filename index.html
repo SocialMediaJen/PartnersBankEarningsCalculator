@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partners Bank Earnings Calculator</title>
+<style>
+* {
+box-sizing: border-box;
+}
+
+html,
+body {
+width: 100%;
+margin: 0;
+padding: 0;
+}
+
+body {
+font-family: Arial, sans-serif;
+background: #f7f7f7;
+padding: 40px;
+}
+.container {
+background: #fff;
+padding: 30px;
+width: 100%;
+max-width: 650px;
+margin: auto;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+h2 {
+text-align: center;
+margin-bottom: 25px;
+}
+label {
+font-weight: bold;
+display: block;
+margin-top: 15px;
+}
+input, select {
+width: 100%;
+padding: 10px;
+margin-top: 5px;
+box-sizing: border-box;
+font-size: 16px;
+}
+.checkbox-row {
+margin-top: 15px;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.checkbox-row input {
+width: auto;
+margin: 0;
+}
+.results {
+margin-top: 25px;
+padding: 18px;
+background: #f1f1f1;
+border-radius: 8px;
+line-height: 1.8;
+}
+.cd-summary {
+margin-top: 15px;
+padding: 16px;
+background: #f8f8f8;
+border: 1px solid #e2e2e2;
+border-radius: 8px;
+}
+.cd-summary-title {
+font-weight: bold;
+margin-bottom: 10px;
+}
+.cd-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px 20px;
+}
+.cd-item {
+font-size: 14px;
+}
+.cd-item span {
+display: block;
+color: #666;
+font-size: 12px;
+margin-bottom: 4px;
+}
+.disclaimer {
+margin-top: 25px;
+font-size: 12px;
+color: #555;
+line-height: 1.6;
+}
+.product-info {
+margin-top: 20px;
+font-size: 13px;
+line-height: 1.6;
+}
+.product-info b {
+display: block;
+margin-top: 10px;
+}
+.hidden {
+display: none;
+}
+a {
+color: #0056b3;
+}
+@media screen and (max-width: 700px) {
+body {
+padding: 12px;
+}
+
+.container {
+width: 100%;
+max-width: 100%;
+padding: 20px;
+}
+
+.cd-grid {
+grid-template-columns: 1fr;
+}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h2>Partners Bank Earnings Calculator</h2>
+
+<label>Account Type</label>
+<select id="accountType">
+<option value="advanced"> Consumer Advanced Checking – 6.17% APY*</option>
+<option value="business">Business Advantage Checking – 3.00% APY*</option>
+<option value="elite">Business Elite Checking – 1.76% APY*</option>
+<option value="mma">Preferred Money Market – 3.09% APY*</option>
+<option value="cd6">6-Month CD – 3.30% APY*</option>
+<option value="cd12">12-Month CD – 3.75% APY*</option>
+</select>
+
+<div class="checkbox-row" id="requirementsRow">
+<input type="checkbox" id="requirements" checked>
+<label for="requirements" style="margin:0; font-weight:normal;">Monthly requirements met</label>
+</div>
+
+<label>Balance</label>
+<input type="text" id="balance" placeholder="Enter balance">
+
+<div class="results">
+<b id="earningsLabel">Annual earnings:</b> <strong id="annualDisplay">$0.00</strong><br>
+<b id="monthlyLabel">Monthly equivalent:</b> <strong id="monthlyDisplay">$0.00</strong>
+</div>
+
+<div class="cd-summary hidden" id="cdSummary">
+<div class="cd-summary-title">CD Summary</div>
+<div class="cd-grid">
+<div class="cd-item"><span>Opening deposit</span><strong id="cdOpening">$0.00</strong></div>
+<div class="cd-item"><span>Estimated interest at maturity</span><strong id="cdInterest">$0.00</strong></div>
+<div class="cd-item"><span>Estimated value at maturity</span><strong id="cdFinal">$0.00</strong></div>
+<div class="cd-item"><span>Term length</span><strong id="cdTerm">--</strong></div>
+</div>
+</div>
+
+<div class="product-info" id="productInfo"></div>
+<div class="disclaimer" id="disclaimer"></div>
+
+</div>
+
+<script>
+function formatNumber(num) {
+return num.toLocaleString('en-US', {
+minimumFractionDigits: 2,
+maximumFractionDigits: 2
+});
+}
+
+function parseInput(value) {
+return parseFloat(value.replace(/,/g, '')) || 0;
+}
+
+function calculateTiered(balance, topRate, overRate, threshold) {
+const firstPortion = Math.min(balance, threshold);
+const excessPortion = Math.max(balance - threshold, 0);
+return (firstPortion * topRate) + (excessPortion * overRate);
+}
+
+function updateDisplay() {
+const accountType = document.getElementById("accountType").value;
+const balance = parseInput(document.getElementById("balance").value);
+const requirementsMet = document.getElementById("requirements").checked;
+const requirementsRow = document.getElementById("requirementsRow");
+const earningsLabel = document.getElementById("earningsLabel");
+const monthlyLabel = document.getElementById("monthlyLabel");
+const productInfo = document.getElementById("productInfo");
+const disclaimer = document.getElementById("disclaimer");
+const cdSummary = document.getElementById("cdSummary");
+
+let earnings = 0;
+let monthly = 0;
+let info = "";
+let disc = "";
+
+cdSummary.classList.add("hidden");
+
+if (accountType === "advanced") {
+requirementsRow.classList.remove("hidden");
+if (requirementsMet) {
+earnings = calculateTiered(balance, 0.0617, 0.0075, 15000);
+} else {
+earnings = balance * 0.0005;
+}
+monthly = earnings / 12;
+earningsLabel.innerText = "Annual earnings:";
+monthlyLabel.innerText = "Monthly equivalent:";
+info = `
+<b>Consumer Advanced Checking:</b>
+6.17% APY* on balances <u>up to $15,000</u> when monthly qualifications are met. 0.75% APY* on balances over $15,000 when monthly qualifications are met. 0.05% APY* on all balances if monthly qualifications are not met.
+<b>Account Qualifications:</b>
+1 ACH debit or credit, 15 debit card transactions of $5 or more, and everyone on the account must get eStatements.
+`;
+disc = `*Annual Percentage Yield (APY) accurate as of 2/28/2023. Account balance affects interest rate. $100 minimum to open an account. Rate is subject to change at any time. Eligible debit card and ACH transactions must post to the account on or before the monthly statement cycle. The statement cycle closes on the last business day of each calendar month; transactions not posted by that date will be excluded. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary based on daily balances and the number of days funds remain on deposit.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+}
+
+if (accountType === "business") {
+requirementsRow.classList.remove("hidden");
+if (requirementsMet) {
+earnings = calculateTiered(balance, 0.03, 0.0075, 15000);
+} else {
+earnings = balance * 0.0005;
+}
+monthly = earnings / 12;
+earningsLabel.innerText = "Annual earnings:";
+monthlyLabel.innerText = "Monthly equivalent:";
+info = `
+<b>Business Advantage Checking:</b>
+3.00% APY* on balances <u>up to $15,000</u> when monthly qualifications are met. 0.75% APY* on balances over $15,000 when monthly qualifications are met. 0.05% APY* on all balances if monthly qualifications are not met.
+<b>Account Qualifications:</b>
+1 ACH debit or credit, 15 debit card transactions of $5 or more, and everyone on the account must get eStatements.
+`;
+disc = `*Annual Percentage Yield (APY) accurate as of 6/5/2025. Account balance affects interest rate. $100 minimum to open an account. Rate is subject to change at any time. Eligible debit card and ACH transactions must post to the account on or before the monthly statement cycle. The statement cycle closes on the last business day of each calendar month; transactions not posted by that date will be excluded. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary based on daily balances and the number of days funds remain on deposit.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+}
+
+if (accountType === "elite") {
+requirementsRow.classList.add("hidden");
+earnings = balance > 15000 ? (balance - 15000) * 0.0176 : 0;
+monthly = earnings / 12;
+earningsLabel.innerText = "Annual earnings:";
+monthlyLabel.innerText = "Monthly equivalent:";
+info = `
+<b>Business Elite Checking:</b>
+1.76% APY* paid on balances of <u>$15,000 or more</u>.
+<b>Account Features:</b>
+Minimum to open: $100. $15.00 service charge. Interest paid on balances of $15,000 or more. One-time set-up fee for Treasury Management with no monthly fee. Treasury Management: $150.00 for first service and $75.00 for each additional service.
+`;
+disc = `*Annual Percentage Yield (APY) accurate as of 6/5/2025. $100 minimum to open an account. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary based on daily balances and the number of days funds remain on deposit.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+}
+
+if (accountType === "mma") {
+requirementsRow.classList.add("hidden");
+earnings = balance > 1000 ? (balance - 1000) * 0.0309 : 0;
+monthly = earnings / 12;
+earningsLabel.innerText = "Annual earnings:";
+monthlyLabel.innerText = "Monthly equivalent:";
+info = `
+<b>Preferred Money Market:</b>
+3.09% APY* paid on balances of <u>$1,000 or more</u>.
+<b>Account Features:</b>
+Minimum to open: $1,000. Service charge: no charge with balances of $1,000 or more. Paper statements: $5 charge. E-statements: $0 charge. Transaction limit: 6 debit transactions per statement cycle. Other fees: $10 per debit transaction over 6 limit.
+<b>Reference:</b>
+Rate based on Fed Funds Effective Rate (0.58% under current <a href="https://fred.stlouisfed.org/series/FEDFUNDS" target="_blank">FRED</a>).
+`;
+disc = `*Annual Percentage Yield (APY) accurate as of 5/2/2026. Interest rate is subject to change based on the Federal Reserve. Interest is compounded monthly. 6 debit transactions without fee per statement cycle. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary based on daily balances and the number of days funds remain on deposit.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+}
+
+if (accountType === "cd6") {
+requirementsRow.classList.add("hidden");
+earnings = balance * (Math.pow(1 + 0.0330, 0.5) - 1);
+monthly = earnings / 6;
+earningsLabel.innerText = "Estimated interest at maturity:";
+monthlyLabel.innerText = "Average monthly earnings:";
+cdSummary.classList.remove("hidden");
+document.getElementById("cdOpening").innerText = "$" + formatNumber(balance);
+document.getElementById("cdInterest").innerText = "$" + formatNumber(earnings);
+document.getElementById("cdFinal").innerText = "$" + formatNumber(balance + earnings);
+document.getElementById("cdTerm").innerText = "6 months";
+info = `
+<b>6-Month CD:</b>
+3.30% APY* fixed-rate certificate of deposit.
+<b>Account Features:</b>
+$500 minimum deposit to open. Competitive, fixed rates that are higher than standard savings. Interest is compounded and paid monthly. No setup fee. Paper statement fees may apply.
+`;
+disc = `*Annual Percentage Yield (APY) accurate as of 7/16/2026. $500 minimum to open an account. Offer is valid for a limited time only. Early withdrawal penalties apply. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+}
+
+if (accountType === "cd12") {
+requirementsRow.classList.add("hidden");
+earnings = balance * 0.0375;
+monthly = earnings / 12;
+earningsLabel.innerText = "Estimated interest at maturity:";
+monthlyLabel.innerText = "Average monthly earnings:";
+cdSummary.classList.remove("hidden");
+document.getElementById("cdOpening").innerText = "$" + formatNumber(balance);
+document.getElementById("cdInterest").innerText = "$" + formatNumber(earnings);
+document.getElementById("cdFinal").innerText = "$" + formatNumber(balance + earnings);
+document.getElementById("cdTerm").innerText = "12 months";
+info = `
+<b>12-Month CD:</b>
+3.75% APY* fixed-rate certificate of deposit.
+<b>Account Features:</b>
+$500 minimum deposit to open. Competitive, fixed rates that are higher than standard savings. Interest is compounded and paid monthly. No setup fee. Paper statement fees may apply.
+`;
+disc = `*Annual Percentage Yield (APY) accurate as of 7/16/2026. $500 minimum to open an account. Offer is valid for a limited time only. Early withdrawal penalties apply. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+}
+
+document.getElementById("annualDisplay").innerText = "$" + formatNumber(earnings);
+document.getElementById("monthlyDisplay").innerText = "$" + formatNumber(monthly);
+productInfo.innerHTML = info;
+disclaimer.innerHTML = disc;
+}
+
+document.getElementById("balance").addEventListener("input", function(e) {
+const raw = e.target.value.replace(/,/g, '').replace(/[^\d.]/g, '');
+if (raw === "") {
+e.target.value = "";
+updateDisplay();
+return;
+}
+const parts = raw.split('.');
+const whole = parts[0] ? Number(parts[0]).toLocaleString('en-US') : "";
+const decimal = parts.length > 1 ? "." + parts[1].slice(0, 2) : "";
+e.target.value = whole + decimal;
+updateDisplay();
+});
+
+document.getElementById("accountType").addEventListener("change", updateDisplay);
+document.getElementById("requirements").addEventListener("change", updateDisplay);
+
+updateDisplay();
+</script>
+</body>
+</html>

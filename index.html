@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,9 +137,9 @@ grid-template-columns: 1fr;
 <option value="advanced"> Consumer Advanced Checking – 6.17% APY*</option>
 <option value="business">Business Advantage Checking – 3.00% APY*</option>
 <option value="elite">Business Elite Checking – 1.76% APY*</option>
-<option value="mma">Preferred Money Market – 3.09% APY*</option>
-<option value="cd6">6-Month CD – 3.30% APY*</option>
-<option value="cd12">12-Month CD – 3.75% APY*</option>
+<option value="mma">Preferred Money Market – 3.22% APY*</option>
+<option value="cd6">6-Month CD – 3.55% APY*</option>
+<option value="cd12">12-Month CD – 4.00% APY*</option>
 </select>
 
 <div class="checkbox-row" id="requirementsRow">
@@ -266,7 +267,7 @@ earningsLabel.innerText = "Annual earnings:";
 monthlyLabel.innerText = "Monthly equivalent:";
 info = `
 <b>Preferred Money Market:</b>
-3.09% APY* paid on balances of <u>$1,000 or more</u>.
+3.22% APY* paid on balances of <u>$1,000 or more</u>.
 <b>Account Features:</b>
 Minimum to open: $1,000. Service charge: no charge with balances of $1,000 or more. Paper statements: $5 charge. E-statements: $0 charge. Transaction limit: 6 debit transactions per statement cycle. Other fees: $10 per debit transaction over 6 limit.
 <b>Reference:</b>
@@ -277,7 +278,7 @@ disc = `*Annual Percentage Yield (APY) accurate as of 5/2/2026. Interest rate is
 
 if (accountType === "cd6") {
 requirementsRow.classList.add("hidden");
-earnings = balance * (Math.pow(1 + 0.0330, 0.5) - 1);
+earnings = balance * 0.0355 / 2;
 monthly = earnings / 6;
 earningsLabel.innerText = "Estimated interest at maturity:";
 monthlyLabel.innerText = "Average monthly earnings:";
@@ -288,16 +289,16 @@ document.getElementById("cdFinal").innerText = "$" + formatNumber(balance + earn
 document.getElementById("cdTerm").innerText = "6 months";
 info = `
 <b>6-Month CD:</b>
-3.30% APY* fixed-rate certificate of deposit.
+3.55% APY* fixed-rate certificate of deposit.
 <b>Account Features:</b>
 $500 minimum deposit to open. Competitive, fixed rates that are higher than standard savings. Interest is compounded and paid monthly. No setup fee. Paper statement fees may apply.
 `;
-disc = `*Annual Percentage Yield (APY) accurate as of 7/16/2026. $500 minimum to open an account. Offer is valid for a limited time only. Early withdrawal penalties apply. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+disc = `*Annual Percentage Yield (APY) accurate as of 9/17/2026. $500 minimum to open an account. Offer is valid for a limited time only. Early withdrawal penalties apply. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
 }
 
 if (accountType === "cd12") {
 requirementsRow.classList.add("hidden");
-earnings = balance * 0.0375;
+earnings = balance * 0.0400;
 monthly = earnings / 12;
 earningsLabel.innerText = "Estimated interest at maturity:";
 monthlyLabel.innerText = "Average monthly earnings:";
@@ -308,11 +309,11 @@ document.getElementById("cdFinal").innerText = "$" + formatNumber(balance + earn
 document.getElementById("cdTerm").innerText = "12 months";
 info = `
 <b>12-Month CD:</b>
-3.75% APY* fixed-rate certificate of deposit.
+4.00% APY* fixed-rate certificate of deposit.
 <b>Account Features:</b>
 $500 minimum deposit to open. Competitive, fixed rates that are higher than standard savings. Interest is compounded and paid monthly. No setup fee. Paper statement fees may apply.
 `;
-disc = `*Annual Percentage Yield (APY) accurate as of 7/16/2026. $500 minimum to open an account. Offer is valid for a limited time only. Early withdrawal penalties apply. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
+disc = `*Annual Percentage Yield (APY) accurate as of 9/17/2026. $500 minimum to open an account. Offer is valid for a limited time only. Early withdrawal penalties apply. Account balance affects interest rate. Rate is subject to change at any time. Other fees and restrictions may apply.<br><br><em>Estimated for illustration purposes only. Calculations are based on the stated Annual Percentage Yield (APY). Actual interest earned may vary.</em><br><br>FDIC Insured – Backed by the full faith and credit of the U.S. Government`;
 }
 
 document.getElementById("annualDisplay").innerText = "$" + formatNumber(earnings);
